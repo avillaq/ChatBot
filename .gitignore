@@ -1,0 +1,6 @@
+# Exclude Environment files
+/env/
+/__pycache__/
+*/__pycache__/
+data.pth
+.venv
