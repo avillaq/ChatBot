@@ -3,7 +3,7 @@ import threading
 from datetime import datetime
 
 class AlertMonitor:
-    """Monitor automático de alertas críticas para red P2P"""
+    """Monitor automatico de alertas críticas para red P2P"""
     
     def __init__(self, enhanced_chatbot, check_interval=30):
         self.enhanced_chatbot = enhanced_chatbot
@@ -12,9 +12,9 @@ class AlertMonitor:
         self.monitor_task = None
     
     def start_monitoring(self):
-        """Iniciar monitoreo automático en hilo separado"""
+        """Iniciar monitoreo automatico en hilo separado"""
         if self.monitoring:
-            print("⚠️ El monitoreo ya está activo")
+            print("⚠️ El monitoreo ya esta activo")
             return
         
         self.monitoring = True

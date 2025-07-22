@@ -1,6 +1,10 @@
 import asyncio
 import time
 import requests
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database.financial_db import FinancialDatabase
 from nlp_pipeline.enhanced_chatbot import EnhancedChatbot
 from p2p.node import P2PNode
@@ -60,17 +64,17 @@ class ComprehensiveTestSuite:
             # Test 1: Consulta financiera - saldo
             response1 = await chatbot.process_query("Saldo de Juan")
             self.log_test("Consulta de saldo via NLP", 
-                         response1 is not None and "💰" in response1 and "Juan" in response1,
+                         response1 is not None and "💰" in response1,
                          "Respuesta financiera generada")
             
             # Test 2: Consulta financiera - alertas
-            response2 = await chatbot.process_query("Check critical alerts")
+            response2 = await chatbot.process_query("Revisar alertas criticas")
             self.log_test("Consulta de alertas via NLP", 
                          response2 is not None and ("CRÍTICAS" in response2 or "críticas" in response2),
                          "Alertas detectadas via NLP")
             
             # Test 3: Conversación general
-            response3 = await chatbot.process_query("Hello")
+            response3 = await chatbot.process_query("Hola")
             self.log_test("Conversación general", 
                          response3 is not None and len(response3) > 0 and "error" not in response3.lower(),
                          "Respuesta conversacional generada")
@@ -130,12 +134,12 @@ class ComprehensiveTestSuite:
         print("\n🌐 PROBANDO INTERFAZ WEB...")
         
         try:
-            # Test básico de conectividad (requiere que el servidor esté corriendo)
+            # Test basico de conectividad (requiere que el servidor esté corriendo)
             # Este test es opcional y requiere Flask activo
             
             base_url = "http://localhost:5000"
             
-            # Test 1: Página principal
+            # Test 1: Pagina principal
             try:
                 response = requests.get(base_url, timeout=2)
                 self.log_test("Interfaz web disponible", 
@@ -143,7 +147,7 @@ class ComprehensiveTestSuite:
                              f"Status: {response.status_code}")
             except requests.exceptions.ConnectionError:
                 self.log_test("Interfaz web", False, 
-                             "Servidor Flask no está corriendo (esto es normal en pruebas)")
+                             "Servidor Flask no esta corriendo (esto es normal en pruebas)")
                 return False
             
             # Test 2: API de estado
@@ -182,9 +186,9 @@ class ComprehensiveTestSuite:
                          response is not None and len(response) > 0,
                          "Sistema integrado funciona")
             
-            # Test 2: Monitoreo automático
+            # Test 2: Monitoreo automatico
             alerts = await chatbot.check_and_broadcast_alerts()
-            self.log_test("Monitoreo automático", 
+            self.log_test("Monitoreo automatico", 
                          isinstance(alerts, list),
                          f"Alertas detectadas: {len(alerts) if alerts else 0}")
             

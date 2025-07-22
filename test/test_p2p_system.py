@@ -1,5 +1,8 @@
 import asyncio
-import time
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from p2p.node import P2PNode
 from nlp_pipeline.enhanced_chatbot import EnhancedChatbot
 from monitoring.alert_monitor import AlertMonitor
@@ -75,8 +78,8 @@ async def test_interactions(node1, node2, node3, chatbot1, chatbot2, chatbot3):
     
     await asyncio.sleep(2)
     
-    # Probar monitoreo automático
-    print("\n🔄 Iniciando monitoreo automático desde nodo 1...")
+    # Probar monitoreo automatico
+    print("\n🔄 Iniciando monitoreo automatico desde nodo 1...")
     monitor = AlertMonitor(chatbot1, check_interval=5)
     monitor.start_monitoring()
     

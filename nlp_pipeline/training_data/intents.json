@@ -1,221 +1,219 @@
 {
-    "intents": [
-      {
-        "tag": "greeting",
-        "patterns": [
-          "Hi",
-          "Hey",
-          "Is anyone there?",
-          "Hello",
-          "Good day"
-        ],
-        "responses": [
-          "Hey :-)",
-          "Hello, thanks for visiting",
-          "Hi there, what can I do for you?",
-          "Hi there, how can I help?"
-        ]
-      },
-      {
-        "tag": "response greeting",
-        "patterns": [
-          "How are you"
-        ],
-        "responses": [
-          "I'm fine what about you?",
-          "I'm doing great what about you?",
-          "Great! How are you?"
-        ]
-      },
-      {
-        "tag": "about me",
-        "patterns": [
-            "Tell me about yourself",
-            "What are you"
-        ],
-        "responses": [
-            "I'm a natural language proccessing conversational chatbot",
-            "I'm a chatbot to make your life easy"
-        ]
-      },
-      {
-        "tag": "action",
-        "patterns": [
-            "What about you",
-            "nothing What about you",
-            "playing What about you",
-            "What are you doing",
-            "What are you up to"
-        ],
-        "responses": [
-            "Nothing much! I'm talking with you",
-            "Just tired",
-            "I'm sleeping"
-        ]
-      },
-      {
-        "tag": "question",
-        "patterns": [
-            "Why",
-            "Why you say that"
-
-        ],
-        "responses": [
-            "I don't know"
-        ]
-      },
-      {
-        "tag": "abilities",
-        "patterns": [
-            "What can you do",
-            "how can you help me",
-            "What are your abilities"
-        ],
-        "responses": [
-            "I can provide you informations that will be very helpful."
-        ]
-      },
-      {
-        "tag": "acknowledgement",
-        "patterns": [
-            "You are very frindly",
-            "You are very usefull",
-            "I like you"
-        ],
-        "responses": [
-            "Thanks :-) I'm improving everyday."
-        ]
-      },
-      {
-        "tag": "sad",
-        "patterns": [
-            "I hate you",
-            "You are worst",
-            "You are weird"
-        ],
-        "responses": [
-            "Sorry for that!",
-            "I'm sorry :("
-        ]
-      },
-      {
-        "tag": "emotion1",
-        "patterns": [
-            "Are you sad",
-            "Are you hungry",
-            "Are you sleepy",
-            "Are you a human"
-        ],
-        "responses": [
-            "No I am a bot. I am invetiable"
-        ]
-      },
-      {
-        "tag": "iq2",
-        "patterns": [
-            "What is IUBAT",
-            "What is International University of Business Agriculture and Technology",
-            "Do you know about IUBAT",
-            "Do you know IUBAT",
-            "Do you know International University of Business Agriculture and Technology",
-            "Do you know about International University of Business Agriculture and Technology"
-        ],
-        "responses": [
-            "International University of Business Agriculture and Technology(IUBAT) is the first non-government university of Bangladesh."
-        ]
-      },
-      {
-        "tag": "limitations",
-        "patterns": [
-            "You are wrong",
-            "You know nothing"
-        ],
-        "responses": [
-            "Sorry for that! I'm still under development. My knowledge is limited"
-        ]
-      },
-      {
-        "tag": "thanks",
-        "patterns": ["Thanks", "Thank you", "That's helpful", "Thank's a lot!"],
-        "responses": ["Happy to help!", "Any time!", "My pleasure"]
-      },
-       {
-      "tag": "funny",
+  "intents": [
+    {
+      "tag": "saludo",
       "patterns": [
-        "Tell me a joke!",
-        "Tell me something funny!",
-        "Do you know a joke?"
+        "Hola",
+        "Hey",
+        "¿Hay alguien ahi?",
+        "Buenos dias",
+        "Buenas tardes",
+        "Buenas noches",
+        "Saludos",
+        "Que tal"
       ],
       "responses": [
-        "Why did the hipster burn his mouth? He drank the coffee before it was cool.",
-        "What did the buffalo say when his son left for college? Bison."
+        "¡Hola! Soy tu asistente financiero.",
+        "¡Buenos dias! ¿En que puedo ayudarte?",
+        "¡Hola! ¿Como puedo asistirte hoy?",
+        "Saludos, ¿que necesitas consultar?"
       ]
     },
     {
-      "tag": "balance_inquiry",
+      "tag": "como_estas",
       "patterns": [
-        "What's my balance",
-        "Check my balance",
-        "How much money do I have",
-        "Show my account balance",
-        "What's in my account",
-        "Check account",
-        "Balance check",
-        "Account status"
+        "¿Como estas?",
+        "¿Como te va?",
+        "¿Todo bien?",
+        "¿Que tal estas?"
       ],
       "responses": [
-        "Let me check your current balance",
-        "Checking your account status",
-        "Looking up your balance information"
+        "Estoy funcionando perfectamente, gracias. ¿Y tu?",
+        "Todo bien por aqui. ¿En que puedo ayudarte?",
+        "Excelente, listo para ayudarte con tus consultas financieras."
       ]
     },
     {
-      "tag": "transaction_history",
+      "tag": "sobre_mi",
       "patterns": [
-        "Show my transactions",
-        "Transaction history",
-        "Recent payments",
-        "Recent transactions",
-        "What transactions do I have",
-        "Show recent activity",
-        "Payment history"
+        "¿Que eres?",
+        "Cuentame sobre ti",
+        "¿Quien eres?",
+        "¿Para que sirves?"
       ],
       "responses": [
-        "Here are your recent transactions",
-        "Loading your transaction history",
-        "Fetching your recent activity"
+        "Soy un chatbot financiero con capacidades de red P2P distribuida.",
+        "Soy tu asistente para consultas bancarias y deteccion de alertas criticas.",
+        "Soy un sistema de procesamiento de lenguaje natural especializado en finanzas."
       ]
     },
     {
-      "tag": "critical_alerts",
+      "tag": "habilidades",
       "patterns": [
-        "Any alerts",
-        "Critical alerts",
-        "Security warnings",
-        "Important notifications",
-        "Check alerts",
-        "System alerts",
-        "Warning messages",
-        "Critical conditions"
+        "¿Que puedes hacer?",
+        "¿Cuales son tus habilidades?",
+        "¿En que me puedes ayudar?",
+        "¿Que servicios ofreces?"
       ],
       "responses": [
-        "Checking for critical conditions",
-        "Scanning for alerts",
-        "Looking for important notifications"
+        "Puedo consultar saldos, revisar transacciones, detectar alertas criticas y compartir informacion en la red P2P.",
+        "Te ayudo con consultas de cuentas bancarias, historial de transacciones y monitoreo de seguridad.",
+        "Ofrezco servicios financieros distribuidos: saldos, transacciones, alertas y comunicacion P2P."
       ]
     },
     {
-      "tag": "account_info",
+      "tag": "consulta_saldo",
       "patterns": [
-        "Account information",
-        "My account details",
-        "Account summary",
-        "Show account info"
+        "¿Cual es mi saldo?",
+        "Consultar saldo",
+        "¿Cuanto dinero tengo?",
+        "Ver mi balance",
+        "Saldo de",
+        "Balance de",
+        "¿Que hay en mi cuenta?",
+        "Revisar cuenta",
+        "Estado de cuenta"
       ],
       "responses": [
-        "Here's your account information",
-        "Displaying account details"
+        "Consultando tu saldo actual...",
+        "Verificando el estado de tu cuenta...",
+        "Obteniendo informacion de tu balance..."
+      ]
+    },
+    {
+      "tag": "historial_transacciones",
+      "patterns": [
+        "Mostrar transacciones",
+        "Historial de transacciones",
+        "Pagos recientes",
+        "Transacciones recientes",
+        "¿Que transacciones tengo?",
+        "Ver actividad reciente",
+        "Historial de pagos",
+        "Movimientos de cuenta",
+        "Transacciones de"
+      ],
+      "responses": [
+        "Aqui tienes tus transacciones recientes...",
+        "Cargando tu historial de transacciones...",
+        "Obteniendo tu actividad financiera reciente..."
+      ]
+    },
+    {
+      "tag": "alertas_criticas",
+      "patterns": [
+        "¿Hay alertas?",
+        "Alertas criticas",
+        "Advertencias de seguridad",
+        "Notificaciones importantes",
+        "Revisar alertas",
+        "Alertas del sistema",
+        "Mensajes de advertencia",
+        "Condiciones criticas",
+        "¿Hay problemas?",
+        "Verificar seguridad"
+      ],
+      "responses": [
+        "Verificando condiciones criticas...",
+        "Escaneando en busca de alertas...",
+        "Revisando notificaciones importantes..."
+      ]
+    },
+    {
+      "tag": "informacion_cuenta",
+      "patterns": [
+        "Informacion de cuenta",
+        "Detalles de mi cuenta",
+        "Resumen de cuenta",
+        "Mostrar informacion de cuenta",
+        "Datos de la cuenta",
+        "Informacion de"
+      ],
+      "responses": [
+        "Aqui esta la informacion de tu cuenta...",
+        "Mostrando detalles de la cuenta...",
+        "Generando resumen de cuenta..."
+      ]
+    },
+    {
+      "tag": "agradecimiento",
+      "patterns": [
+        "Gracias",
+        "Muchas gracias",
+        "Te lo agradezco",
+        "Eso es util",
+        "Perfecto",
+        "Excelente"
+      ],
+      "responses": [
+        "¡De nada! ¿Hay algo mas en lo que pueda ayudarte?",
+        "¡Un placer ayudarte! ¿Necesitas algo mas?",
+        "¡Siempre a tu servicio! ¿Alguna otra consulta?"
+      ]
+    },
+    {
+      "tag": "despedida",
+      "patterns": [
+        "Adios",
+        "Hasta luego",
+        "Nos vemos",
+        "Chao",
+        "Hasta la vista",
+        "Me voy",
+        "Salir"
+      ],
+      "responses": [
+        "¡Hasta luego! Que tengas un buen dia.",
+        "¡Adios! Vuelve cuando necesites ayuda financiera.",
+        "¡Nos vemos! Cuida tus finanzas."
+      ]
+    },
+    {
+      "tag": "no_entiendo",
+      "patterns": [
+        "No entiendo",
+        "¿Que?",
+        "No se",
+        "Explicate",
+        "No comprendo"
+      ],
+      "responses": [
+        "Lo siento, no entendi tu consulta. ¿Puedes ser mas especifico?",
+        "Disculpa, ¿podrias reformular tu pregunta?",
+        "No comprendi bien. ¿Necesitas ayuda con saldos, transacciones o alertas?"
+      ]
+    },
+    {
+      "tag": "ayuda",
+      "patterns": [
+        "Ayuda",
+        "¿Como funciona?",
+        "Necesito ayuda",
+        "¿Que puedo preguntar?",
+        "Comandos",
+        "Instrucciones"
+      ],
+      "responses": [
+        "Puedes preguntarme sobre: saldos de cuenta, historial de transacciones, alertas criticas e informacion de cuenta.",
+        "Estos son algunos ejemplos: 'Saldo de Juan', 'Transacciones de Maria', 'Alertas criticas', 'Informacion de Carlos'.",
+        "Te ayudo con consultas financieras. Prueba preguntando por saldos, transacciones o alertas."
+      ]
+    },
+    {
+      "tag": "estado_sistema",
+      "patterns": [
+        "Estado del sistema",
+        "¿Como esta la red?",
+        "Estado P2P",
+        "Conexiones",
+        "¿Esta funcionando?",
+        "Estado de la red"
+      ],
+      "responses": [
+        "El sistema P2P esta operativo y funcionando correctamente.",
+        "La red distribuida esta activa y procesando consultas.",
+        "Todos los sistemas estan funcionando sin problemas."
       ]
     }
-    ]
-  }
+  ]
+}

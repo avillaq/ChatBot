@@ -324,7 +324,7 @@
                         <li onclick="sendExample('Transacciones de María')">• Transacciones de María</li>
                         <li onclick="sendExample('Alertas críticas')">• Alertas críticas</li>
                         <li onclick="sendExample('Información de Carlos')">• Información de Carlos</li>
-                        <li onclick="sendExample('Hello')">• Hello (conversación general)</li>
+                        <li onclick="sendExample('Hola')">• Hola (conversación general)</li>
                     </ul>
                 </div>
                 
@@ -465,7 +465,7 @@
             const port = document.getElementById('peerPort').value;
             
             if (!port) {
-                alert('Ingresa un puerto válido');
+                alert('Ingresa un puerto valido');
                 return;
             }
             
@@ -523,7 +523,7 @@
                     systemInitialized = data.system_running;
                     
                     if (systemInitialized && !document.getElementById('messageInput').disabled) {
-                        // Ya está habilitado
+                        // Ya esta habilitado
                     } else if (systemInitialized) {
                         enableInterface();
                     }

@@ -14,7 +14,7 @@ class P2PChatBot:
         
         # Configurar nodo P2P
         self.node_port = node_port
-        self.p2p_node = P2PNode('localhost', node_port, f'financial_bot_{node_port}')
+        self.p2p_node = P2PNode('localhost', node_port, f'bot_financiero_{node_port}')
         
         # Configurar chatbot mejorado
         self.enhanced_chatbot = EnhancedChatbot("financial.db")
@@ -24,7 +24,7 @@ class P2PChatBot:
         self.alert_monitor = AlertMonitor(self.enhanced_chatbot, check_interval=30)
         
         # Variables del chatbot original
-        self.name = "FinancialBot"
+        self.name = "AsistenteFinanciero"
     
     def set_name(self, name):
         self.name = name
@@ -41,22 +41,29 @@ class P2PChatBot:
             audio = recognizer.listen(mic, timeout=15)
             text = "Error"
         try:
-            text = recognizer.recognize_google(audio)
-            print("Me -> ", text)
+            text = recognizer.recognize_google(audio, language='es-ES')
+            print("Usuario -> ", text)
             return text
         except sr.RequestError as e:
-            print("404 -> Could not request results; {0}".format(e))
+            print("404 -> No se pudo procesar la solicitud: {0}".format(e))
             return text
         except sr.UnknownValueError:
-            print("404 -> Unknown error occurred")
+            print("404 -> No se pudo entender el audio")
             return text
     
     def text_to_speech(self, text):
         """Convertir texto a voz"""
-        print("AI -> ", text)
+        print("Bot -> ", text)
         speaker = pyttsx3.init()
-        voice = speaker.getProperty('voices')
-        speaker.setProperty('voice', voice[1].id)
+        voices = speaker.getProperty('voices')
+        
+        # Intentar configurar voz en español
+        for voice in voices:
+            if 'spanish' in voice.name.lower() or 'es' in voice.id.lower():
+                speaker.setProperty('voice', voice.id)
+                break
+        
+        speaker.setProperty('rate', 150)  # Velocidad mas lenta
         speaker.say(text)
         speaker.runAndWait()
     
@@ -80,7 +87,7 @@ class P2PChatBot:
         
         print(f"✅ Sistema P2P activo!")
         print(f"📡 Para conectar otros nodos usar puerto: {self.node_port}")
-        print(f"🔍 Monitoreo automático de alertas activo")
+        print(f"🔍 Monitoreo automatico de alertas activo")
         
         return server_task
     
@@ -91,7 +98,7 @@ class P2PChatBot:
     def get_network_status(self):
         """Obtener estado de la red P2P"""
         peers = self.p2p_node.get_connected_peers()
-        return f"🌐 Red P2P: {len(peers)} peers conectados: {peers}"
+        return f"🌐 Red P2P: {len(peers)} nodos conectados: {peers}"
 
 async def main():
     """Función principal del chatbot P2P"""
@@ -99,7 +106,7 @@ async def main():
     # Configurar puerto del nodo
     print("🔧 Configuración del nodo P2P")
     try:
-        port = int(input("Puerto para este nodo (default 8000): ") or "8000")
+        port = int(input("Puerto para este nodo (por defecto 8000): ") or "8000")
     except ValueError:
         port = 8000
     
@@ -115,8 +122,8 @@ async def main():
     
     if connect_choice == 's':
         try:
-            peer_host = input("Host del peer (default localhost): ") or "localhost"
-            peer_port = int(input("Puerto del peer: "))
+            peer_host = input("Host del nodo (por defecto localhost): ") or "localhost"
+            peer_port = int(input("Puerto del nodo: "))
             await ai.connect_to_peer(peer_host, peer_port)
         except Exception as e:
             print(f"❌ Error conectando: {e}")
@@ -124,28 +131,29 @@ async def main():
     # Mostrar estado de la red
     print(f"\n{ai.get_network_status()}")
     
+    action = None
     try:
         # Interfaz de usuario
-        ai.text_to_speech("Sistema P2P listo. ¿Quieres chatear o usar voz?")
-        action = int(input("(1 para chat, 2 para voz): "))
+        ai.text_to_speech("Sistema P2P listo. ¿Quieres usar chat de texto o voz?")
+        action = int(input("(1 para texto, 2 para voz): "))
         
         if action == 1:
             # Modo chat
-            print("\n💬 Modo Chat P2P - Escribe 'quit' para salir")
+            print("\n💬 Modo Chat P2P - Escribe 'salir' para terminar")
             print("💡 Prueba consultas como: 'saldo de Juan', 'alertas críticas', 'transacciones de María'")
             
             while True:
-                user_input = input("\nMe -> ")
+                user_input = input("\nUsuario -> ")
                 
-                if any(i in user_input.lower() for i in ["quit", "exit", "salir"]):
+                if any(i in user_input.lower() for i in ["salir", "exit", "quit", "adiós"]):
                     break
-                elif "network status" in user_input.lower():
+                elif "estado de la red" in user_input.lower():
                     print(ai.get_network_status())
-                elif "your name" in user_input.lower() or "tu nombre" in user_input.lower():
-                    print(f"AI -> Soy {ai.get_name()}")
+                elif "tu nombre" in user_input.lower() or "cómo te llamas" in user_input.lower():
+                    print(f"Bot -> Soy {ai.get_name()}")
                 else:
                     response = await ai.chat(user_input)
-                    print(f"AI -> {response}")
+                    print(f"Bot -> {response}")
         
         elif action == 2:
             # Modo voz
@@ -162,11 +170,11 @@ async def main():
             while True:
                 res = ai.speech_to_text()
                 
-                if isinstance(res, str) and any(i in res.lower() for i in ["thank", "thanks"]):
+                if isinstance(res, str) and any(i in res.lower() for i in ["gracias", "muchas gracias"]):
                     ai.text_to_speech("¡De nada!")
-                elif isinstance(res, str) and any(i in res.lower() for i in ["your name", "tu nombre"]):
+                elif isinstance(res, str) and any(i in res.lower() for i in ["tu nombre", "cómo te llamas"]):
                     ai.text_to_speech(f"Soy {ai.get_name()}")
-                elif isinstance(res, str) and any(i in res.lower() for i in ["exit", "quit", "salir", "bye"]):
+                elif isinstance(res, str) and any(i in res.lower() for i in ["salir", "adiós", "hasta luego"]):
                     break
                 else:
                     if res == "Error":
@@ -189,11 +197,13 @@ async def main():
             "¡Nos vemos!", 
             "¡Adiós!"
         ])
-        
         if action == 2:
             ai.text_to_speech(farewell)
         else:
-            print(f"AI -> {farewell}")
+            print(f"Bot -> {farewell}")
+        if not server_task.done():
+            server_task.cancel()
+            print(f"Bot -> {farewell}")
 
 if __name__ == "__main__":
     print("🚀 ChatBot P2P Financiero")

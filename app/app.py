@@ -64,7 +64,7 @@ chat_manager = WebChatbotManager()
 
 @app.route('/')
 def index():
-    """Página principal"""
+    """Pagina principal"""
     return render_template('index.html')
 
 @app.route('/api/init', methods=['POST'])
@@ -84,7 +84,7 @@ def init_system():
         else:
             return jsonify({
                 'success': False, 
-                'message': 'Sistema ya está activo'
+                'message': 'Sistema ya esta activo'
             })
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})

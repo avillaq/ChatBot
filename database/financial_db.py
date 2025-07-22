@@ -1,7 +1,5 @@
 import sqlite3
-import random
 from datetime import datetime, timedelta
-import json
 
 class FinancialDatabase:
     def __init__(self, db_path="financial.db"):
@@ -71,7 +69,7 @@ class FinancialDatabase:
         # Crear cuentas de ejemplo
         sample_accounts = [
             ("Juan Pérez", 50.0, "checking"),  # Saldo bajo crítico
-            ("María González", 15000.0, "savings"),
+            ("María Gonzalez", 15000.0, "savings"),
             ("Carlos López", 5.0, "checking"),  # Saldo crítico
             ("Ana Torres", 25000.0, "business")
         ]

@@ -1,4 +1,8 @@
 import asyncio
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from nlp_pipeline.enhanced_chatbot import EnhancedChatbot
 from p2p.node import P2PNode
 from monitoring.alert_monitor import AlertMonitor
@@ -181,7 +185,7 @@ async def main():
         # Mostrar estado inicial
         demo.show_network_status()
         
-        # Demostrar funcionalidades automáticas
+        # Demostrar funcionalidades automaticas
         await demo.demonstrate_financial_queries()
         await demo.demonstrate_alert_propagation()
         
