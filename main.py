@@ -1,7 +1,6 @@
 import asyncio
 import speech_recognition as sr
 import pyttsx3
-import os
 import numpy as np
 from nlp_pipeline.enhanced_chatbot import EnhancedChatbot
 from p2p.node import P2PNode
