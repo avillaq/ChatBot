@@ -109,6 +109,7 @@ def chat():
         response = loop.run_until_complete(
             chat_manager.process_message(message, user_name)
         )
+        response = (response or "").replace('Â', '')
         
         return jsonify({
             'success': True, 

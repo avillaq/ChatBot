@@ -69,7 +69,7 @@ class FinancialDatabase:
         # Crear cuentas de ejemplo
         sample_accounts = [
             ("Juan Pérez", 50.0, "checking"),  # Saldo bajo crítico
-            ("María Gonzalez", 15000.0, "savings"),
+            ("Maria Gonzalez", 15000.0, "savings"),
             ("Carlos López", 5.0, "checking"),  # Saldo crítico
             ("Ana Torres", 25000.0, "business")
         ]
