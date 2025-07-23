@@ -28,7 +28,7 @@ class AlertMonitor:
         monitor_thread = threading.Thread(target=run_monitor, daemon=True)
         monitor_thread.start()
         
-        print(f"🔄 Monitoreo de alertas iniciado (cada {self.check_interval}s)")
+        print(f" Monitoreo de alertas iniciado (cada {self.check_interval}s)")
     
     async def _monitor_loop(self):
         """Loop principal de monitoreo"""
@@ -39,7 +39,7 @@ class AlertMonitor:
                 
                 if alerts:
                     timestamp = datetime.now().strftime("%H:%M:%S")
-                    print(f"\n[{timestamp}] 🔍 Monitor: {len(alerts)} condiciones críticas detectadas")
+                    print(f"\n[{timestamp}]  Monitor: {len(alerts)} condiciones críticas detectadas")
                     
                     # Log de alertas para debug
                     for alert in alerts:
@@ -55,9 +55,9 @@ class AlertMonitor:
     def stop_monitoring(self):
         """Detener monitoreo"""
         self.monitoring = False
-        print("⏹️ Monitoreo de alertas detenido")
+        print(" Monitoreo de alertas detenido")
     
     def set_check_interval(self, seconds):
         """Cambiar intervalo de verificación"""
         self.check_interval = seconds
-        print(f"⏰ Intervalo de monitoreo cambiado a {seconds}s")
+        print(f" Intervalo de monitoreo cambiado a {seconds}s")

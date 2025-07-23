@@ -123,7 +123,7 @@ class EnhancedChatbot:
         
         if user_name:
             result = self.db.get_recent_transactions(user_name, 5)
-            return f"📋 {result}"
+            return f" {result}"
         else:
             return "Para ver el historial, necesito que me digas el nombre. Por ejemplo: 'Transacciones de María'"
     
@@ -138,17 +138,17 @@ class EnhancedChatbot:
             if self.p2p_node:
                 try:
                     await self.p2p_node.broadcast_alert(alerts)
-                    print(f"📡 {len(alerts)} alertas compartidas con la red P2P")
+                    print(f" {len(alerts)} alertas compartidas con la red P2P")
                 except Exception as e:
                     print(f"⚠️ Error enviando alertas: {e}")
             
             # Formatear respuesta
-            response = "🚨 ALERTAS CRÍTICAS DETECTADAS:\n\n"
+            response = " ALERTAS CRÍTICAS DETECTADAS:\n\n"
             for alert in alerts:
                 response += f"• {alert['message']}\n"
             
             peer_count = len(self.p2p_node.peers) if self.p2p_node else 0
-            response += f"\n📡 Alertas enviadas a {peer_count} nodos conectados"
+            response += f"\n Alertas enviadas a {peer_count} nodos conectados"
             return response
         else:
             return "✅ No hay alertas críticas en este momento. Todos los sistemas funcionan normalmente."
@@ -163,7 +163,7 @@ class EnhancedChatbot:
             balance_info = self.db.get_account_balance(user_name)
             transaction_info = self.db.get_recent_transactions(user_name, 3)
             
-            return f"👤 INFORMACIÓN DE CUENTA:\n\n💰 {balance_info}\n\n📋 Últimas transacciones:\n{transaction_info}"
+            return f"👤 INFORMACIÓN DE CUENTA:\n\n💰 {balance_info}\n\n Últimas transacciones:\n{transaction_info}"
         else:
             return "Para ver la información de cuenta, necesito que me digas el nombre."
     
@@ -197,7 +197,7 @@ class EnhancedChatbot:
         if alerts and self.p2p_node:
             try:
                 await self.p2p_node.broadcast_alert(alerts)
-                print(f"🔄 Monitoreo automatico: {len(alerts)} alertas enviadas a la red")
+                print(f" Monitoreo automatico: {len(alerts)} alertas enviadas a la red")
                 return alerts
             except Exception as e:
                 print(f"❌ Error en monitoreo automatico: {e}")

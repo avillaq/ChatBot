@@ -151,7 +151,7 @@ class FinancialDatabase:
                 "type": "ACTIVIDAD_SOSPECHOSA",
                 "account_id": account_id,
                 "user_name": user_name,
-                "message": f"🚨 ALERTA CRÍTICA: Actividad sospechosa para {user_name}: ${total_amount:.2f} en 24h",
+                "message": f" ALERTA CRÍTICA: Actividad sospechosa para {user_name}: ${total_amount:.2f} en 24h",
                 "severity": 9,
                 "data": {"total_amount": total_amount}
             }
@@ -171,7 +171,7 @@ class FinancialDatabase:
                 "type": "INCIDENTE_DE_SEGURIDAD",
                 "account_id": account_id,
                 "user_name": user_name,
-                "message": f"🔒 ALERTA CRÍTICA: {attempts} intentos fallidos para {user_name}",
+                "message": f" ALERTA CRÍTICA: {attempts} intentos fallidos para {user_name}",
                 "severity": 10,
                 "data": {"failed_attempts": attempts}
             }
@@ -255,7 +255,7 @@ class FinancialDatabase:
         conn.close()
         
         if alerts:
-            result = "🚨 ALERTAS CRÍTICAS ACTIVAS:\n"
+            result = " ALERTAS CRÍTICAS ACTIVAS:\n"
             for alert_type, message, severity, timestamp in alerts:
                 result += f"• {message} (Severidad: {severity})\n"
             return result
@@ -267,7 +267,7 @@ if __name__ == "__main__":
     print("🔧 Inicializando base de datos financiera...")
     db = FinancialDatabase()
     
-    print("\n📊 Detectando condiciones críticas...")
+    print("\n Detectando condiciones críticas...")
     alerts = db.detect_critical_conditions()
     
     for alert in alerts:

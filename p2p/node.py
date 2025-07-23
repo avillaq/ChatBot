@@ -29,7 +29,7 @@ class P2PNode:
     
     async def start_server(self):
         """Iniciar servidor WebSocket"""
-        print(f"🔄 Iniciando servidor P2P en {self.host}:{self.port}")
+        print(f" Iniciando servidor P2P en {self.host}:{self.port}")
         
         async def handle_client(websocket):
             try:
@@ -85,7 +85,7 @@ class P2PNode:
     
     async def handle_new_connection(self, websocket):
         """Manejar nueva conexión entrante"""
-        print("🔗 Nueva conexión entrante")
+        print(" Nueva conexión entrante")
     
     async def handle_disconnection(self, websocket):
         """Manejar desconexión"""
@@ -123,7 +123,7 @@ class P2PNode:
         
         if action == 'join' and sender_id:
             self.peers[sender_id] = sender_websocket
-            print(f"🤝 Nuevo peer registrado: {sender_id}")
+            print(f" Nuevo peer registrado: {sender_id}")
             
             # Responder con confirmación
             response = P2PProtocol.create_message(
@@ -151,7 +151,7 @@ class P2PNode:
         sender_id = message.get('sender_id')
         alert_content = message.get('content')
         
-        print(f"\n🚨 ALERTA CRÍTICA RECIBIDA DE {sender_id}:")
+        print(f"\n ALERTA CRÍTICA RECIBIDA DE {sender_id}:")
         if isinstance(alert_content, list):
             for alert in alert_content:
                 print(f"   {alert.get('message', 'Sin mensaje')}")
@@ -164,7 +164,7 @@ class P2PNode:
         sender_id = message.get('sender_id')
         content = message.get('content', {})
         
-        print(f"\n💬 CHAT COMPARTIDO POR {sender_id}:")
+        print(f"\n CHAT COMPARTIDO POR {sender_id}:")
         print(f"   Usuario: {content.get('user_input', 'N/A')}")
         print(f"   Bot: {content.get('bot_response', 'N/A')}")
         print("-" * 30)
@@ -181,7 +181,7 @@ class P2PNode:
             # Enviar a peer específico
             try:
                 await self.peers[target_id].send(message)
-                print(f"📤 Mensaje enviado a {target_id}")
+                print(f" Mensaje enviado a {target_id}")
             except Exception as e:
                 print(f"❌ Error enviando a {target_id}: {e}")
         else:
@@ -190,7 +190,7 @@ class P2PNode:
             for peer_id, websocket in self.peers.items():
                 try:
                     await websocket.send(message)
-                    print(f"📤 Mensaje enviado a {peer_id}")
+                    print(f" Mensaje enviado a {peer_id}")
                 except Exception as e:
                     print(f"❌ Error enviando a {peer_id}: {e}")
                     disconnected_peers.append(peer_id)

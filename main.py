@@ -74,7 +74,7 @@ class P2PChatBot:
     
     async def start_p2p_mode(self):
         """Iniciar modo P2P"""
-        print(f"🌐 Iniciando nodo P2P en puerto {self.node_port}...")
+        print(f" Iniciando nodo P2P en puerto {self.node_port}...")
         
         # Iniciar servidor P2P en background
         server_task = asyncio.create_task(self.p2p_node.start_server())
@@ -86,8 +86,8 @@ class P2PChatBot:
         await asyncio.sleep(2)
         
         print(f"✅ Sistema P2P activo!")
-        print(f"📡 Para conectar otros nodos usar puerto: {self.node_port}")
-        print(f"🔍 Monitoreo automatico de alertas activo")
+        print(f" Para conectar otros nodos usar puerto: {self.node_port}")
+        print(f" Monitoreo automatico de alertas activo")
         
         return server_task
     
@@ -98,7 +98,7 @@ class P2PChatBot:
     def get_network_status(self):
         """Obtener estado de la red P2P"""
         peers = self.p2p_node.get_connected_peers()
-        return f"🌐 Red P2P: {len(peers)} nodos conectados: {peers}"
+        return f" Red P2P: {len(peers)} nodos conectados: {peers}"
 
 async def main():
     """Función principal del chatbot P2P"""
@@ -117,7 +117,7 @@ async def main():
     server_task = await ai.start_p2p_mode()
     
     # Preguntar si conectar a otros nodos
-    print("\n🔗 ¿Quieres conectarte a otros nodos?")
+    print("\n ¿Quieres conectarte a otros nodos?")
     connect_choice = input("(s/n): ").lower()
     
     if connect_choice == 's':
@@ -139,8 +139,8 @@ async def main():
         
         if action == 1:
             # Modo chat
-            print("\n💬 Modo Chat P2P - Escribe 'salir' para terminar")
-            print("💡 Prueba consultas como: 'saldo de Juan', 'alertas críticas', 'transacciones de María'")
+            print("\n Modo Chat P2P - Escribe 'salir' para terminar")
+            print(" Prueba consultas como: 'saldo de Juan', 'alertas críticas', 'transacciones de María'")
             
             while True:
                 user_input = input("\nUsuario -> ")
@@ -184,7 +184,7 @@ async def main():
                         ai.text_to_speech(response)
     
     except KeyboardInterrupt:
-        print("\n⏹️ Deteniendo sistema...")
+        print("\n Deteniendo sistema...")
     
     finally:
         # Cleanup
@@ -206,7 +206,7 @@ async def main():
             print(f"Bot -> {farewell}")
 
 if __name__ == "__main__":
-    print("🚀 ChatBot P2P Financiero")
+    print(" ChatBot P2P Financiero")
     print("=" * 40)
     
     try:

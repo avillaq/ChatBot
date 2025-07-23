@@ -45,7 +45,7 @@ class LiveDemo:
         await asyncio.sleep(2)
         
         # Conectar nodos en topología de malla
-        print("\n🔗 Conectando nodos...")
+        print("\n Conectando nodos...")
         await self.nodes['Sucursal_A'].connect_to_peer('localhost', 8201, 'Banco_Central')
         await self.nodes['Sucursal_B'].connect_to_peer('localhost', 8201, 'Banco_Central')
         await self.nodes['Sucursal_B'].connect_to_peer('localhost', 8202, 'Sucursal_A')
@@ -55,13 +55,13 @@ class LiveDemo:
         # Iniciar monitoreo en todos los nodos
         for name, monitor in self.monitors.items():
             monitor.start_monitoring()
-            print(f"  📡 Monitor activo en {name}")
+            print(f"   Monitor activo en {name}")
         
         print("✅ Red P2P configurada y operativa!")
         
     def show_network_status(self):
         """Mostrar estado de la red"""
-        print("\n📊 ESTADO DE LA RED P2P:")
+        print("\n ESTADO DE LA RED P2P:")
         print("=" * 50)
         
         for name, node in self.nodes.items():
@@ -84,17 +84,17 @@ class LiveDemo:
         ]
         
         for query, node_name in demo_queries:
-            print(f"\n🔍 Consulta desde {node_name}: '{query}'")
+            print(f"\n Consulta desde {node_name}: '{query}'")
             
             chatbot = self.chatbots[node_name]
             response = await chatbot.process_query(query)
             
-            print(f"📤 Respuesta: {response[:100]}...")
+            print(f" Respuesta: {response[:100]}...")
             await asyncio.sleep(2)
     
     async def demonstrate_alert_propagation(self):
         """Demostrar propagación de alertas"""
-        print("\n🚨 DEMOSTRANDO PROPAGACIÓN DE ALERTAS:")
+        print("\n DEMOSTRANDO PROPAGACIÓN DE ALERTAS:")
         print("=" * 50)
         
         print("Forzando detección de alertas críticas...")
@@ -104,7 +104,7 @@ class LiveDemo:
         alerts = await chatbot.check_and_broadcast_alerts()
         
         if alerts:
-            print(f"📡 {len(alerts)} alertas detectadas y enviadas a la red:")
+            print(f" {len(alerts)} alertas detectadas y enviadas a la red:")
             for alert in alerts:
                 print(f"  - {alert['type']}: {alert['user_name']}")
         else:
@@ -114,7 +114,7 @@ class LiveDemo:
     
     async def interactive_demo(self):
         """Demostración interactiva"""
-        print("\n💬 MODO INTERACTIVO:")
+        print("\n MODO INTERACTIVO:")
         print("=" * 50)
         print("Escribe consultas para probar el sistema distribuido")
         print("Comandos especiales:")
@@ -137,7 +137,7 @@ class LiveDemo:
                 elif user_input.lower() == 'alerts':
                     chatbot = self.chatbots[current_node]
                     alerts = await chatbot.check_and_broadcast_alerts()
-                    print(f"🔍 {len(alerts) if alerts else 0} alertas detectadas")
+                    print(f" {len(alerts) if alerts else 0} alertas detectadas")
                 elif user_input.lower().startswith('switch '):
                     new_node = user_input[7:].strip()
                     if new_node in self.nodes:
@@ -149,7 +149,7 @@ class LiveDemo:
                 elif user_input:
                     chatbot = self.chatbots[current_node]
                     response = await chatbot.process_query(user_input)
-                    print(f"🤖 {response}")
+                    print(f" {response}")
                 
             except KeyboardInterrupt:
                 print("\n👋 Saliendo...")
@@ -159,7 +159,7 @@ class LiveDemo:
     
     def cleanup(self):
         """Limpiar recursos"""
-        print("\n🧹 Limpiando recursos...")
+        print("\n Limpiando recursos...")
         
         # Detener monitores
         for monitor in self.monitors.values():
@@ -173,7 +173,7 @@ class LiveDemo:
 
 async def main():
     """Función principal de demostración"""
-    print("🚀 DEMOSTRACIÓN EN VIVO - CHATBOT P2P FINANCIERO")
+    print(" DEMOSTRACIÓN EN VIVO - CHATBOT P2P FINANCIERO")
     print("=" * 60)
     
     demo = LiveDemo()
@@ -193,12 +193,12 @@ async def main():
         await demo.interactive_demo()
         
     except KeyboardInterrupt:
-        print("\n⏹️ Demostración interrumpida")
+        print("\n Demostración interrumpida")
     except Exception as e:
         print(f"❌ Error en demostración: {e}")
     finally:
         demo.cleanup()
 
 if __name__ == "__main__":
-    print("💡 Presiona Ctrl+C para detener la demostración\n")
+    print(" Presiona Ctrl+C para detener la demostración\n")
     asyncio.run(main())

@@ -24,7 +24,7 @@ class ComprehensiveTestSuite:
         
     def test_database_functionality(self):
         """Probar funcionalidad de base de datos"""
-        print("\n🗄️ PROBANDO BASE DE DATOS...")
+        print("\n PROBANDO BASE DE DATOS...")
         
         try:
             # Crear BD de prueba
@@ -56,7 +56,7 @@ class ComprehensiveTestSuite:
     
     async def test_enhanced_chatbot(self):
         """Probar chatbot mejorado"""
-        print("\n🤖 PROBANDO CHATBOT MEJORADO...")
+        print("\n PROBANDO CHATBOT MEJORADO...")
         
         try:
             chatbot = EnhancedChatbot("test_comprehensive.db")
@@ -87,7 +87,7 @@ class ComprehensiveTestSuite:
     
     async def test_p2p_network(self):
         """Probar red P2P"""
-        print("\n🌐 PROBANDO RED P2P...")
+        print("\n PROBANDO RED P2P...")
         
         try:
             # Crear 2 nodos para prueba
@@ -131,7 +131,7 @@ class ComprehensiveTestSuite:
     
     def test_web_interface(self):
         """Probar interfaz web"""
-        print("\n🌐 PROBANDO INTERFAZ WEB...")
+        print("\n PROBANDO INTERFAZ WEB...")
         
         try:
             # Test basico de conectividad (requiere que el servidor esté corriendo)
@@ -168,7 +168,7 @@ class ComprehensiveTestSuite:
     
     async def test_integration_scenario(self):
         """Probar escenario de integración completa"""
-        print("\n🔄 PROBANDO ESCENARIO DE INTEGRACIÓN...")
+        print("\n PROBANDO ESCENARIO DE INTEGRACIÓN...")
         
         try:
             # Crear sistema completo
@@ -203,7 +203,7 @@ class ComprehensiveTestSuite:
     
     def test_requirements_compliance(self):
         """Verificar cumplimiento de requisitos del proyecto"""
-        print("\n📋 VERIFICANDO CUMPLIMIENTO DE REQUISITOS...")
+        print("\n VERIFICANDO CUMPLIMIENTO DE REQUISITOS...")
         
         # Requisito 1: Arquitectura P2P (sin servidor central)
         self.log_test("✓ Arquitectura P2P", True, 
@@ -235,7 +235,7 @@ class ComprehensiveTestSuite:
     
     async def run_all_tests(self):
         """Ejecutar todas las pruebas"""
-        print("🚀 INICIANDO SUITE COMPLETA DE PRUEBAS")
+        print(" INICIANDO SUITE COMPLETA DE PRUEBAS")
         print("=" * 60)
         
         start_time = time.time()
@@ -263,7 +263,7 @@ class ComprehensiveTestSuite:
         duration = end_time - start_time
         
         print("\n" + "=" * 60)
-        print("📊 RESUMEN DE PRUEBAS")
+        print(" RESUMEN DE PRUEBAS")
         print("=" * 60)
         
         passed = sum(1 for result in self.test_results if "✅ PASS" in result)
@@ -271,15 +271,15 @@ class ComprehensiveTestSuite:
         
         print(f"✅ Pruebas exitosas: {passed}")
         print(f"❌ Pruebas fallidas: {failed}")
-        print(f"⏱️ Tiempo total: {duration:.2f} segundos")
-        print(f"📈 Tasa de éxito: {(passed/(passed+failed)*100):.1f}%")
+        print(f" Tiempo total: {duration:.2f} segundos")
+        print(f" Tasa de éxito: {(passed/(passed+failed)*100):.1f}%")
         
         if failed == 0:
             print("\n🎉 ¡TODAS LAS PRUEBAS PASARON! Sistema listo para producción.")
         else:
             print(f"\n⚠️ {failed} pruebas fallaron. Revisar implementación.")
         
-        print("\n📋 DETALLE DE RESULTADOS:")
+        print("\n DETALLE DE RESULTADOS:")
         for result in self.test_results:
             print(f"  {result}")
 
