@@ -1,8 +1,5 @@
 import asyncio
 import websockets
-import json
-import threading
-import time
 from datetime import datetime
 from p2p.protocol import P2PProtocol
 

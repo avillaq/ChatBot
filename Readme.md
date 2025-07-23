@@ -79,7 +79,7 @@ Este proyecto implementa un **chatbot financiero distribuido** que opera en una 
 
 1. **Clonar/descargar el proyecto**
 ```bash
-cd chatbot-sd
+cd chatbot
 ```
 
 2. **Instalar dependencias**
@@ -215,14 +215,6 @@ import nltk
 nltk.download('punkt')
 ```
 
-## 📊 Métricas del Proyecto
-
-- **Líneas de código**: ~2,000 líneas
-- **Archivos**: 15+ módulos
-- **Funcionalidades**: 6 componentes principales
-- **Pruebas**: 20+ casos de prueba
-- **Cobertura**: Requisitos 100% cumplidos
-
 ## 🏆 Características Destacadas
 
 1. **🌐 Verdaderamente P2P**: Sin punto único de falla
@@ -248,11 +240,3 @@ nltk.download('punkt')
 - Gestión comunitaria de riesgos
 - Transparencia en alertas
 - Acceso democrático a información
-
----
-
-## 📞 Soporte
-
-Para soporte técnico o mejoras, contacta al equipo de desarrollo.
-
-**¡Sistema listo para producción! 🚀**
