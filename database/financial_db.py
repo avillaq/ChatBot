@@ -122,7 +122,7 @@ class FinancialDatabase:
         
         for account_id, user_name, balance in low_balance_accounts:
             alert = {
-                "type": "LOW_BALANCE",
+                "type": "SALDO_BAJO",
                 "account_id": account_id,
                 "user_name": user_name,
                 "message": f"⚠️ ALERTA CRÍTICA: Saldo bajo para {user_name}: ${balance:.2f}",
@@ -148,7 +148,7 @@ class FinancialDatabase:
             user_name = cursor.fetchone()[0]
             
             alert = {
-                "type": "SUSPICIOUS_ACTIVITY",
+                "type": "ACTIVIDAD_SOSPECHOSA",
                 "account_id": account_id,
                 "user_name": user_name,
                 "message": f"🚨 ALERTA CRÍTICA: Actividad sospechosa para {user_name}: ${total_amount:.2f} en 24h",
@@ -168,7 +168,7 @@ class FinancialDatabase:
         
         for account_id, user_name, attempts in failed_attempts:
             alert = {
-                "type": "SECURITY_BREACH",
+                "type": "INCIDENTE_DE_SEGURIDAD",
                 "account_id": account_id,
                 "user_name": user_name,
                 "message": f"🔒 ALERTA CRÍTICA: {attempts} intentos fallidos para {user_name}",

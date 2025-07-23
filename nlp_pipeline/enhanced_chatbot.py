@@ -23,6 +23,9 @@ class EnhancedChatbot:
     
     async def process_query(self, user_input, user_name=None):
         """Procesar consulta del usuario con capacidades financieras"""
+
+        if not user_input or not user_input.strip():
+            return "Por favor, escribe una consulta válida."
         
         # Clasificar intent usando el modelo base
         intent = self.classify_intent(user_input)
@@ -172,17 +175,16 @@ class EnhancedChatbot:
         
         # Buscar patrones como "saldo de Juan", "transacciones de María", etc.
         patterns = [
-            r'(?:de|para|del|de la)\s+([A-Za-záéíóúñÑ\s]+)',
-            r'(?:usuario|cuenta de)\s+([A-Za-záéíóúñÑ\s]+)',
-            r'([A-Za-záéíóúñÑ]+)\s*(?:cuenta|saldo|transacciones)',
-        ]
+        r'(?:saldo|balance|transacciones|información|info)\s+(?:de|del|para)\s+([A-Za-záéíóúñÑ]+(?:\s+[A-Za-záéíóúñÑ]+)?)',
+        r'(?:usuario|cuenta)\s+([A-Za-záéíóúñÑ]+(?:\s+[A-Za-záéíóúñÑ]+)?)',
+    ]
         
         for pattern in patterns:
             match = re.search(pattern, user_input, re.IGNORECASE)
             if match:
                 name = match.group(1).strip()
                 # Filtrar palabras comunes que no son nombres
-                common_words = ['mi', 'mis', 'el', 'la', 'los', 'las', 'cuenta', 'saldo', 'transacciones']
+                common_words = ['mi', 'mis', 'el', 'la', 'los', 'las', 'cuenta', 'saldo', 'transacciones', 'información', 'info', 'de', 'del', 'para']
                 if name.lower() not in common_words and len(name) > 0:
                     return name
         

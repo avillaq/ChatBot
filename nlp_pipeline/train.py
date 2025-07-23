@@ -6,7 +6,7 @@ from torch.utils.data import Dataset, DataLoader
 from model import NeuralNetwork
 from nltk_lib import tokenizer, stemming, bag_of_words
 
-with open("./nlp_pipeline/training_data/intents.json", 'r') as stream:
+with open("./nlp_pipeline/training_data/intents.json", 'r', encoding='utf-8') as stream:
     intents = json.load(stream)
 
 all_words = []

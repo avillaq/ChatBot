@@ -6,7 +6,7 @@ from nlp_pipeline.nltk_lib import bag_of_words, tokenizer
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-with open('./nlp_pipeline/training_data/intents.json', 'r') as json_data:
+with open('./nlp_pipeline/training_data/intents.json', 'r', encoding='utf-8') as json_data:
     intents = json.load(json_data)
 
 FILE = "./nlp_pipeline/data.pth"
