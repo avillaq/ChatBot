@@ -1,0 +1,30 @@
+{
+  "node_id": "Banco_Nacional",
+  "port": 8001,
+  "web_port": 5000,
+  "host": "0.0.0.0",
+  "database": "/app/data/banco_nacional.db",
+  "node_type": "sucursal",
+  "auto_connect": [
+    {
+      "host": "banco-principal",
+      "port": 8000,
+      "node_id": "Banco_Principal"
+    }
+  ],
+  "monitoring": {
+    "interval": 25,
+    "enabled": true,
+    "alert_threshold": 2
+  },
+  "p2p": {
+    "heartbeat_interval": 20,
+    "connection_timeout": 5,
+    "retry_attempts": 3
+  },
+  "features": {
+    "auto_alerts": true,
+    "chat_sharing": true,
+    "voice_enabled": false
+  }
+}

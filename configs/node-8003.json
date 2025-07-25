@@ -1,0 +1,30 @@
+{
+  "node_id": "Banco_Regional", 
+  "port": 8003,
+  "web_port": 5000,
+  "host": "0.0.0.0",
+  "database": "/app/data/banco_regional.db",
+  "node_type": "sucursal",
+  "auto_connect": [
+    {
+      "host": "banco-principal",
+      "port": 8000,
+      "node_id": "Banco_Principal"
+    }
+  ],
+  "monitoring": {
+    "interval": 40,
+    "enabled": true,
+    "alert_threshold": 1
+  },
+  "p2p": {
+    "heartbeat_interval": 30,
+    "connection_timeout": 5,
+    "retry_attempts": 3
+  },
+  "features": {
+    "auto_alerts": true,
+    "chat_sharing": true,
+    "voice_enabled": false
+  }
+}

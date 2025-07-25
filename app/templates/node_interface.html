@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nodo P2P Financiero</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #60a5fa;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header h1 {
+            color: #60a5fa;
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .header .node-info {
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+        
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            height: calc(100vh - 120px);
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .chat-panel {
+            background: #1e293b;
+            border-radius: 15px;
+            border: 2px solid #334155;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .chat-header {
+            background: #334155;
+            padding: 15px 20px;
+            border-radius: 13px 13px 0 0;
+            border-bottom: 1px solid #475569;
+        }
+        
+        .current-node {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+        
+        .current-node-info {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #0f172a;
+            margin: 0;
+        }
+        
+        .message {
+            margin: 12px 0;
+            padding: 12px 16px;
+            border-radius: 10px;
+            max-width: 80%;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .message.user {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .message.bot {
+            background: #334155;
+            color: #e2e8f0;
+            border: 1px solid #475569;
+        }
+        
+        .message.system {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            text-align: center;
+            max-width: 100%;
+            font-weight: 500;
+        }
+        
+        .message.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            text-align: center;
+            max-width: 100%;
+        }
+        
+        .chat-input {
+            padding: 20px;
+            background: #334155;
+            border-radius: 0 0 13px 13px;
+            border-top: 1px solid #475569;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .input-row input {
+            flex: 1;
+            padding: 12px 16px;
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 14px;
+        }
+        
+        .input-row input:focus {
+            outline: none;
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .btn:disabled {
+            background: #4b5563;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .examples {
+            margin-top: 10px;
+        }
+        
+        .examples-title {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+        
+        .example-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .example-btn {
+            padding: 6px 12px;
+            background: #475569;
+            border: none;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .example-btn:hover {
+            background: #60a5fa;
+        }
+        
+        .sidebar {
+            background: #1e293b;
+            border-radius: 15px;
+            border: 2px solid #334155;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .sidebar h3 {
+            color: #60a5fa;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .status-card {
+            background: #334155;
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #475569;
+        }
+        
+        .status-item {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        
+        .status-active {
+            color: #10b981;
+        }
+        
+        .status-inactive {
+            color: #ef4444;
+        }
+        
+        .logs-container {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #475569;
+        }
+        
+        .log-entry {
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        
+        .log-entry.system {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .log-entry.success {
+            background: rgba(16, 185, 129, 0.2);
+            border-left: 3px solid #10b981;
+        }
+        
+        .log-entry.error {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 3px solid #ef4444;
+        }
+        
+        .log-entry.user {
+            background: rgba(96, 165, 250, 0.2);
+            border-left: 3px solid #60a5fa;
+        }
+        
+        .log-entry.bot {
+            background: rgba(156, 163, 175, 0.2);
+            border-left: 3px solid #9ca3af;
+        }
+        
+        .log-timestamp {
+            color: #6b7280;
+            font-size: 0.75rem;
+            margin-right: 8px;
+        }
+        
+        .connection-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .connection-form input {
+            padding: 10px 12px;
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 13px;
+        }
+        
+        .connection-form input:focus {
+            outline: none;
+            border-color: #60a5fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 id="nodeTitle">Nodo P2P Financiero</h1>
+        <div class="node-info" id="nodeInfo">Cargando información del nodo...</div>
+    </div>
+    
+    <div class="main-container">
+        <!-- Panel de chat -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <div class="current-node" id="currentNodeName">Nodo P2P</div>
+                <div class="current-node-info" id="currentNodeInfo">Sistema iniciando...</div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message system">
+                    Bienvenido al nodo P2P financiero. El sistema se está iniciando...
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <div class="input-row">
+                    <input type="text" id="messageInput" placeholder="Escribe tu consulta..." 
+                           onkeypress="handleKeyPress(event)" disabled>
+                    <button class="btn btn-primary" onclick="sendMessage()" id="sendBtn" disabled>
+                        Enviar
+                    </button>
+                </div>
+                
+                <div class="examples">
+                    <div class="examples-title">Consultas de ejemplo:</div>
+                    <div class="example-buttons">
+                        <button class="example-btn" onclick="sendExample('Saldo de Juan')" disabled>Saldo de Juan</button>
+                        <button class="example-btn" onclick="sendExample('Transacciones de María')" disabled>Transacciones</button>
+                        <button class="example-btn" onclick="sendExample('Alertas críticas')" disabled>Alertas críticas</button>
+                        <button class="example-btn" onclick="sendExample('Información de Carlos')" disabled>Info cuenta</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div>
+                <h3>Estado del Nodo</h3>
+                <div class="status-card" id="statusCard">
+                    <div class="status-item">
+                        <strong>Estado:</strong> <span id="nodeStatus" class="status-inactive">Iniciando</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>ID:</strong> <span id="nodeId">N/A</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Puerto:</strong> <span id="nodePort">N/A</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Peers:</strong> <span id="peersCount">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h3>Conectar Peer</h3>
+                <div class="connection-form">
+                    <input type="text" id="peerHost" placeholder="Host (ej: banco-principal)" value="banco-principal">
+                    <input type="number" id="peerPort" placeholder="Puerto (ej: 8000)" min="8000" max="9999">
+                    <button class="btn btn-success" onclick="connectToPeer()" id="connectBtn">
+                        Conectar
+                    </button>
+                </div>
+            </div>
+            
+            <div>
+                <h3>Logs del Sistema</h3>
+                <div class="logs-container" id="logsContainer">
+                    <div class="log-entry system">
+                        <span class="log-timestamp">--:--:--</span>
+                        Sistema iniciando...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let nodeReady = false;
+        let autoRefreshInterval;
+        
+        // Inicialización
+        window.onload = function() {
+            refreshStatus();
+            
+            // Auto-refresh cada 5 segundos
+            autoRefreshInterval = setInterval(() => {
+                refreshStatus();
+                refreshLogs();
+            }, 5000);
+        };
+        
+        // Gestión de chat
+        function addMessage(message, type) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = message.replace(/\n/g, '<br>');
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        function sendExample(text) {
+            if (!nodeReady) {
+                addMessage('El sistema aún se está iniciando...', 'system');
+                return;
+            }
+            document.getElementById('messageInput').value = text;
+            sendMessage();
+        }
+        
+        async function sendMessage() {
+            if (!nodeReady) {
+                addMessage('El sistema aún se está iniciando...', 'system');
+                return;
+            }
+            
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            // Mostrar mensaje del usuario
+            addMessage(message, 'user');
+            messageInput.value = '';
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addMessage(data.response, 'bot');
+                    
+                    // Actualizar estado después del mensaje
+                    setTimeout(() => {
+                        refreshStatus();
+                        refreshLogs();
+                    }, 1000);
+                } else {
+                    addMessage(`Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                addMessage(`Error de conexión: ${error.message}`, 'error');
+            }
+        }
+        
+        // Gestión de estado
+        async function refreshStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateNodeDisplay(data.node_status);
+                    nodeReady = data.system_running;
+                    
+                    if (nodeReady && !document.getElementById('messageInput').disabled) {
+                        // Ya está habilitado
+                    } else if (nodeReady) {
+                        enableInterface();
+                        addMessage('✅ Sistema P2P listo para usar', 'system');
+                    }
+                }
+            } catch (error) {
+                console.error('Error refreshing status:', error);
+            }
+        }
+        
+        function updateNodeDisplay(nodeStatus) {
+            // Actualizar header
+            if (nodeStatus.config) {
+                document.getElementById('nodeTitle').textContent = 
+                    `${nodeStatus.config.node_id} - Nodo P2P Financiero`;
+                document.getElementById('nodeInfo').textContent = 
+                    `Puerto ${nodeStatus.port} | Tipo: ${nodeStatus.config.node_type}`;
+            }
+            
+            // Actualizar panel actual
+            document.getElementById('currentNodeName').textContent = nodeStatus.node_id || 'N/A';
+            document.getElementById('currentNodeInfo').textContent = 
+                `Puerto ${nodeStatus.port} | ${nodeStatus.peers_count} peers conectados | Estado: ${nodeStatus.status}`;
+            
+            // Actualizar sidebar
+            const statusSpan = document.getElementById('nodeStatus');
+            statusSpan.textContent = nodeStatus.status === 'active' ? 'Activo' : 'Inactivo';
+            statusSpan.className = nodeStatus.status === 'active' ? 'status-active' : 'status-inactive';
+            
+            document.getElementById('nodeId').textContent = nodeStatus.node_id || 'N/A';
+            document.getElementById('nodePort').textContent = nodeStatus.port || 'N/A';
+            document.getElementById('peersCount').textContent = 
+                `${nodeStatus.peers_count} (${nodeStatus.peers.join(', ')})`;
+        }
+        
+        function enableInterface() {
+            document.getElementById('messageInput').disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+            document.querySelectorAll('.example-btn').forEach(btn => btn.disabled = false);
+        }
+        
+        // Gestión de conexiones
+        async function connectToPeer() {
+            const host = document.getElementById('peerHost').value.trim();
+            const port = document.getElementById('peerPort').value;
+            
+            if (!host || !port) {
+                addMessage('Ingresa host y puerto válidos', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/connect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ host: host, port: parseInt(port) })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addMessage(`✅ ${data.message}`, 'system');
+                    
+                    // Limpiar form
+                    document.getElementById('peerHost').value = '';
+                    document.getElementById('peerPort').value = '';
+                    
+                    // Refresh después de conectar
+                    setTimeout(refreshStatus, 2000);
+                } else {
+                    addMessage(`❌ Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                addMessage(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Gestión de logs
+        async function refreshLogs() {
+            try {
+                const response = await fetch('/api/logs');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateLogsDisplay(data.logs);
+                }
+            } catch (error) {
+                console.error('Error refreshing logs:', error);
+            }
+        }
+        
+        function updateLogsDisplay(logs) {
+            const logsContainer = document.getElementById('logsContainer');
+            logsContainer.innerHTML = '';
+            
+            if (logs.length === 0) {
+                logsContainer.innerHTML = '<div class="log-entry system"><span class="log-timestamp">--:--:--</span>No hay logs disponibles</div>';
+                return;
+            }
+            
+            logs.slice(-20).forEach(log => {  // Últimos 20 logs
+                const logDiv = document.createElement('div');
+                logDiv.className = `log-entry ${log.type}`;
+                logDiv.innerHTML = `<span class="log-timestamp">${log.timestamp}</span>${log.message}`;
+                logsContainer.appendChild(logDiv);
+            });
+            
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>
