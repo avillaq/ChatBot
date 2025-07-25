@@ -27,14 +27,18 @@ class WebChatbotManager:
         
     def initialize(self, port=8000):
         """Inicializar sistema P2P principal"""
-        self.p2p_node = P2PNode('localhost', port, f'main_node_{port}')
-        self.chatbot = EnhancedChatbot("financial.db")
+        # Base de datos específica para nodo principal
+        main_db_path = f"financial_main_{port}.db"
+        
+        self.p2p_node = P2PNode('localhost', port, f'Banco_Principal_{port}')
+        self.chatbot = EnhancedChatbot(main_db_path, node_id=f'main_{port}')
         self.chatbot.set_p2p_node(self.p2p_node)
         self.alert_monitor = AlertMonitor(self.chatbot, check_interval=20)
         
         # Inicializar logs del nodo principal
         self.node_logs[port] = []
-        self.add_node_log(port, f"Nodo principal inicializado en puerto {port}", "system")
+        self.add_node_log(port, f"Banco Principal inicializado en puerto {port}", "system")
+        self.add_node_log(port, f"Base de datos: {main_db_path}", "info")
         
         # Iniciar servidor P2P en hilo separado
         def run_p2p():
@@ -58,7 +62,7 @@ class WebChatbotManager:
         self.add_node_log(port, "Sistema P2P activo y funcionando", "success")
         
     def create_real_demo_network(self):
-        """Crear red de demostración con nodos P2P REALES"""
+        """Crear red de demostración con nodos P2P REALES y BD independientes"""
         if not self.is_running:
             return False, "Sistema principal no inicializado"
             
@@ -69,13 +73,17 @@ class WebChatbotManager:
             try:
                 print(f"🔧 Creando nodo demo real: {name} en puerto {port}")
                 
+                # Base de datos específica para cada nodo demo
+                demo_db_path = f"financial_{name.lower()}_{port}.db"
+                
                 # Inicializar logs para este nodo
                 self.node_logs[port] = []
                 self.add_node_log(port, f"Iniciando {name} en puerto {port}", "system")
+                self.add_node_log(port, f"Base de datos: {demo_db_path}", "info")
                 
-                # Crear nodo P2P real
+                # Crear nodo P2P real con BD independiente
                 demo_node = P2PNode('localhost', port, name)
-                demo_chatbot = EnhancedChatbot("financial.db")
+                demo_chatbot = EnhancedChatbot(demo_db_path, node_id=name.lower())
                 demo_chatbot.set_p2p_node(demo_node)
                 demo_monitor = AlertMonitor(demo_chatbot, check_interval=30)
                 
@@ -141,7 +149,7 @@ class WebChatbotManager:
         return True, "Red de demostración creada exitosamente"
     
     def add_node_log(self, port, message, log_type="info"):
-        """Agregar log a un nodo específico"""
+        """Agregar log a un nodo específico - MEJORADO para incluir logs P2P"""
         if port not in self.node_logs:
             self.node_logs[port] = []
         
@@ -153,9 +161,9 @@ class WebChatbotManager:
         
         self.node_logs[port].append(log_entry)
         
-        # Mantener solo los últimos 50 logs
-        if len(self.node_logs[port]) > 50:
-            self.node_logs[port] = self.node_logs[port][-50:]
+        # Mantener solo los últimos 100 logs
+        if len(self.node_logs[port]) > 100:
+            self.node_logs[port] = self.node_logs[port][-100:]
     
     async def process_message_for_node(self, port, message, user_name=None):
         """Procesar mensaje para un nodo específico"""
@@ -174,6 +182,29 @@ class WebChatbotManager:
             return response
         else:
             return "Nodo no disponible"
+    def get_node_logs_combined(self, port):
+        """Obtener logs combinados del nodo (aplicación + P2P)"""
+        app_logs = self.node_logs.get(port, [])
+        
+        # Obtener logs P2P del nodo
+        p2p_logs = []
+        if port == 8000 and self.p2p_node:
+            p2p_logs = self.p2p_node.get_p2p_logs()
+        elif port in self.demo_nodes:
+            p2p_logs = self.demo_nodes[port].get_p2p_logs()
+        
+        # Combinar logs
+        combined_logs = list(app_logs)
+        for p2p_log in p2p_logs:
+            combined_logs.append({
+                'timestamp': p2p_log['timestamp'],
+                'message': f"P2P: {p2p_log['message']}",
+                'type': p2p_log['type']
+            })
+        
+        # Ordenar por timestamp y devolver los últimos 50
+        combined_logs.sort(key=lambda x: x['timestamp'])
+        return combined_logs[-50:]
     
     def get_node_info(self, port):
         """Obtener información detallada de un nodo"""
@@ -306,7 +337,6 @@ class WebChatbotManager:
 # Instancia global del manager
 chat_manager = WebChatbotManager()
 
-# ... (rutas anteriores)
 
 @app.route('/')
 def index():
@@ -367,12 +397,13 @@ def chat_with_node(port):
 
 @app.route('/api/nodes/<int:port>/logs')
 def get_node_logs(port):
-    """Obtener logs de un nodo específico"""
+    """Obtener logs combinados de un nodo específico"""
     try:
-        logs = chat_manager.node_logs.get(port, [])
+        logs = chat_manager.get_node_logs_combined(port)
         return jsonify({
             'success': True,
-            'logs': logs[-20:]  # Últimos 20 logs
+            'logs': logs,
+            'node_port': port
         })
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})

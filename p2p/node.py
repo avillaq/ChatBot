@@ -4,7 +4,7 @@ from datetime import datetime
 from p2p.protocol import P2PProtocol
 
 class P2PNode:
-    """Nodo P2P para comunicación distribuida"""
+    """Nodo P2P para comunicación distribuida con logs centralizados"""
     
     def __init__(self, host='localhost', port=8000, node_id=None):
         self.host = host
@@ -14,6 +14,9 @@ class P2PNode:
         self.message_handlers = {}
         self.running = False
         self.server = None
+        
+        # Sistema de logs P2P
+        self.p2p_logs = []
         
         # Configurar handlers por defecto
         self.setup_default_handlers()
@@ -27,9 +30,30 @@ class P2PNode:
             P2PProtocol.MESSAGE_TYPES['CHAT']: self.handle_chat_message
         }
     
+    def add_p2p_log(self, message, log_type="info"):
+        """Agregar entrada al log P2P"""
+        log_entry = {
+            'timestamp': datetime.now().strftime('%H:%M:%S'),
+            'message': message,
+            'type': log_type,
+            'node_id': self.node_id
+        }
+        
+        self.p2p_logs.append(log_entry)
+        
+        # Mantener solo los últimos 100 logs
+        if len(self.p2p_logs) > 100:
+            self.p2p_logs = self.p2p_logs[-100:]
+        
+        print(f"[{log_entry['timestamp']}] {self.node_id}: {message}")
+    
+    def get_p2p_logs(self):
+        """Obtener logs P2P del nodo"""
+        return self.p2p_logs
+    
     async def start_server(self):
         """Iniciar servidor WebSocket"""
-        print(f" Iniciando servidor P2P en {self.host}:{self.port}")
+        self.add_p2p_log(f"Iniciando servidor en {self.host}:{self.port}")
         
         async def handle_client(websocket):
             try:
@@ -39,11 +63,11 @@ class P2PNode:
             except websockets.exceptions.ConnectionClosed:
                 await self.handle_disconnection(websocket)
             except Exception as e:
-                print(f"❌ Error en conexión: {e}")
+                self.add_p2p_log(f"Error en conexión: {e}", "error")
         
         self.server = await websockets.serve(handle_client, self.host, self.port)
         self.running = True
-        print(f"✅ Servidor P2P activo en {self.host}:{self.port}")
+        self.add_p2p_log(f"Servidor P2P activo en {self.host}:{self.port}", "success")
         
         # Mantener servidor corriendo
         await self.server.wait_closed()
@@ -65,13 +89,13 @@ class P2PNode:
             )
             await websocket.send(discovery_msg)
             
-            print(f"✅ Conectado a peer {peer_id} en {uri}")
+            self.add_p2p_log(f"Conectado a peer {peer_id} en {uri}", "success")
             
             # Escuchar mensajes del peer
             asyncio.create_task(self.listen_to_peer(websocket, peer_id))
             
         except Exception as e:
-            print(f"❌ Error conectando a {peer_host}:{peer_port} - {e}")
+            self.add_p2p_log(f"Error conectando a {peer_host}:{peer_port} - {e}", "error")
     
     async def listen_to_peer(self, websocket, peer_id):
         """Escuchar mensajes de un peer específico"""
@@ -81,11 +105,11 @@ class P2PNode:
         except websockets.exceptions.ConnectionClosed:
             if peer_id in self.peers:
                 del self.peers[peer_id]
-                print(f"🔌 Peer {peer_id} desconectado")
+                self.add_p2p_log(f"Peer {peer_id} desconectado", "warning")
     
     async def handle_new_connection(self, websocket):
         """Manejar nueva conexión entrante"""
-        print(" Nueva conexión entrante")
+        self.add_p2p_log("Nueva conexión P2P entrante")
     
     async def handle_disconnection(self, websocket):
         """Manejar desconexión"""
@@ -98,13 +122,13 @@ class P2PNode:
         
         if peer_to_remove:
             del self.peers[peer_to_remove]
-            print(f"🔌 Peer {peer_to_remove} desconectado")
+            self.add_p2p_log(f"Peer {peer_to_remove} desconectado", "warning")
     
     async def process_message(self, raw_message, sender_websocket):
         """Procesar mensaje recibido"""
         message = P2PProtocol.parse_message(raw_message)
         if not message:
-            print("❌ Mensaje malformado recibido")
+            self.add_p2p_log("Mensaje malformado recibido", "error")
             return
         
         msg_type = message.get('type')
@@ -113,7 +137,7 @@ class P2PNode:
         if handler:
             await handler(message, sender_websocket)
         else:
-            print(f"⚠️ No hay handler para tipo de mensaje: {msg_type}")
+            self.add_p2p_log(f"No hay handler para tipo: {msg_type}", "warning")
     
     async def handle_discovery(self, message, sender_websocket):
         """Manejar mensaje de descubrimiento"""
@@ -123,7 +147,7 @@ class P2PNode:
         
         if action == 'join' and sender_id:
             self.peers[sender_id] = sender_websocket
-            print(f" Nuevo peer registrado: {sender_id}")
+            self.add_p2p_log(f"Nuevo peer registrado: {sender_id}", "success")
             
             # Responder con confirmación
             response = P2PProtocol.create_message(
@@ -147,32 +171,33 @@ class P2PNode:
         await sender_websocket.send(response)
     
     async def handle_alert(self, message, sender_websocket):
-        """Manejar alerta crítica recibida"""
+        """Manejar alerta crítica recibida - MEJORADO PARA LOGS"""
         sender_id = message.get('sender_id')
         alert_content = message.get('content')
         
-        print(f"\n ALERTA CRÍTICA RECIBIDA DE {sender_id}:")
+        # Registrar alerta en logs P2P
         if isinstance(alert_content, list):
             for alert in alert_content:
-                print(f"   {alert.get('message', 'Sin mensaje')}")
+                alert_msg = f"🚨 ALERTA de {sender_id}: {alert.get('message', 'Sin mensaje')}"
+                self.add_p2p_log(alert_msg, "alert")
         else:
-            print(f"   {alert_content}")
-        print("=" * 50)
+            alert_msg = f"🚨 ALERTA de {sender_id}: {alert_content}"
+            self.add_p2p_log(alert_msg, "alert")
+        
+        self.add_p2p_log(f"Procesada alerta crítica de {sender_id}", "system")
     
     async def handle_chat_message(self, message, sender_websocket):
         """Manejar mensaje de chat compartido"""
         sender_id = message.get('sender_id')
         content = message.get('content', {})
         
-        print(f"\n CHAT COMPARTIDO POR {sender_id}:")
-        print(f"   Usuario: {content.get('user_input', 'N/A')}")
-        print(f"   Bot: {content.get('bot_response', 'N/A')}")
-        print("-" * 30)
+        chat_log = f"💬 CHAT de {sender_id}: {content.get('user_input', 'N/A')}"
+        self.add_p2p_log(chat_log, "chat")
     
     async def broadcast_message(self, message_type, content, target_id=None):
         """Enviar mensaje a todos los peers o a uno específico"""
         if not self.peers:
-            print("⚠️ No hay peers conectados para enviar mensaje")
+            self.add_p2p_log("No hay peers para enviar mensaje", "warning")
             return
         
         message = P2PProtocol.create_message(message_type, content, self.node_id, target_id)
@@ -181,26 +206,32 @@ class P2PNode:
             # Enviar a peer específico
             try:
                 await self.peers[target_id].send(message)
-                print(f" Mensaje enviado a {target_id}")
+                self.add_p2p_log(f"Mensaje enviado a {target_id}", "system")
             except Exception as e:
-                print(f"❌ Error enviando a {target_id}: {e}")
+                self.add_p2p_log(f"Error enviando a {target_id}: {e}", "error")
         else:
             # Broadcast a todos los peers
             disconnected_peers = []
+            sent_count = 0
+            
             for peer_id, websocket in self.peers.items():
                 try:
                     await websocket.send(message)
-                    print(f" Mensaje enviado a {peer_id}")
+                    sent_count += 1
                 except Exception as e:
-                    print(f"❌ Error enviando a {peer_id}: {e}")
+                    self.add_p2p_log(f"Error enviando a {peer_id}: {e}", "error")
                     disconnected_peers.append(peer_id)
             
             # Limpiar peers desconectados
             for peer_id in disconnected_peers:
                 del self.peers[peer_id]
+            
+            if sent_count > 0:
+                self.add_p2p_log(f"Broadcast enviado a {sent_count} peers", "system")
     
     async def broadcast_alert(self, alerts):
-        """Enviar alerta crítica a todos los peers"""
+        """Enviar alerta crítica a todos los peers - MEJORADO"""
+        self.add_p2p_log(f"Enviando {len(alerts) if isinstance(alerts, list) else 1} alertas a la red", "system")
         await self.broadcast_message(
             P2PProtocol.MESSAGE_TYPES['ALERT'],
             alerts
@@ -214,6 +245,8 @@ class P2PNode:
             'context': 'financial_chat',
             'timestamp': datetime.now().isoformat()
         }
+        
+        self.add_p2p_log(f"Compartiendo chat: {user_input[:30]}...", "system")
         await self.broadcast_message(
             P2PProtocol.MESSAGE_TYPES['CHAT'],
             content
@@ -228,3 +261,4 @@ class P2PNode:
         self.running = False
         if self.server:
             self.server.close()
+        self.add_p2p_log("Nodo P2P detenido", "system")
