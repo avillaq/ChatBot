@@ -5,8 +5,9 @@ from database.financial_db import FinancialDatabase
 class EnhancedChatbot:
     """Chatbot mejorado con capacidades financieras y P2P"""
     
-    def __init__(self, db_path="financial.db"):
-        self.db = FinancialDatabase(db_path)
+    def __init__(self, db_path="financial.db", node_id="main"):
+        self.node_id = node_id
+        self.db = FinancialDatabase(db_path, node_id)
         self.p2p_node = None
         
         # Mapeo de intents a funciones
