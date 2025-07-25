@@ -14,9 +14,7 @@ from monitoring.alert_monitor import AlertMonitor
 
 app = Flask(__name__)
 
-class DockerChatbotManager:
-    """Gestor de chatbot simplificado para un solo nodo Docker"""
-    
+class WebChatbotManager:
     def __init__(self):
         self.chatbot = None
         self.p2p_node = None
@@ -130,18 +128,25 @@ class DockerChatbotManager:
                     loop = asyncio.new_event_loop()
                     asyncio.set_event_loop(loop)
                     loop.run_until_complete(
-                        self.p2p_node.connect_to_peer(host, port, peer_id)
+                        self.p2p_node.connect_to_peer('localhost', port, f'demo_bank_{port}')
                     )
+                    print(f"✅ Nodo principal conectado a demo {port}")
+                    self.add_node_log(8000, f"Conectado al nodo {port}", "success")
+                    self.add_node_log(port, f"Conectado al nodo principal (8000)", "success")
+                    time.sleep(0.5)
                     
-                    self.add_log(f"Auto-conexión exitosa a {peer_id} ({host}:{port})", "success")
-                    time.sleep(1)
+                # Iniciar monitores de demo
+                for port in demo_ports:
+                    self.demo_monitors[port].start_monitoring()
+                    self.add_node_log(port, "Monitor de alertas iniciado", "info")
                     
-                except Exception as e:
-                    self.add_log(f"Error auto-conectando a {host}:{port} - {e}", "error")
+            except Exception as e:
+                print(f"Error conectando nodos demo: {e}")
         
-        # Ejecutar conexiones en thread separado
-        connect_thread = threading.Thread(target=connect_to_peers, daemon=True)
+        connect_thread = threading.Thread(target=connect_demo_nodes, daemon=True)
         connect_thread.start()
+        
+        return True, "Red de demostración creada exitosamente"
     
     def add_node_log(self, port, message, log_type="info"):
         """Agregar log a un nodo específico - MEJORADO para incluir logs P2P"""
@@ -154,7 +159,7 @@ class DockerChatbotManager:
             'type': log_type
         }
         
-        self.node_logs.append(log_entry)
+        self.node_logs[port].append(log_entry)
         
         # Mantener solo los últimos 100 logs
         if len(self.node_logs[port]) > 100:
@@ -258,118 +263,133 @@ class DockerChatbotManager:
     # ... (resto de métodos anteriores)
     async def process_message(self, message, user_name=None):
         """Procesar mensaje de chat"""
-        if not self.chatbot:
-            return "Sistema no inicializado"
+        if self.chatbot:
+            return await self.chatbot.process_query(message, user_name)
+        return "Sistema no inicializado"
         
-        try:
-            self.add_log(f"Usuario: {message}", "user")
-            response = await self.chatbot.process_query(message, user_name)
-            self.add_log(f"Bot: {response[:100]}{'...' if len(response) > 100 else ''}", "bot")
-            
-            # Agregar logs P2P recientes
-            if self.p2p_node:
-                p2p_logs = self.p2p_node.get_p2p_logs()
-                for p2p_log in p2p_logs[-3:]:  # Últimos 3 logs P2P
-                    self.add_log(f"P2P: {p2p_log['message']}", "system")
-            
-            return response
-            
-        except Exception as e:
-            error_msg = f"Error procesando mensaje: {str(e)}"
-            self.add_log(error_msg, "error")
-            return error_msg
-    
-    def get_node_status(self):
-        """Obtener estado actual del nodo"""
-        if not self.p2p_node or not self.is_running:
-            return {
-                'status': 'inactive',
-                'node_id': 'N/A',
-                'peers_count': 0,
-                'peers': []
-            }
-        
-        peers = self.p2p_node.get_connected_peers()
-        return {
-            'status': 'active',
-            'node_id': self.p2p_node.node_id,
-            'port': self.p2p_node.port,
-            'peers_count': len(peers),
-            'peers': peers,
-            'config': self.config
-        }
-    
-    def get_logs(self):
-        """Obtener logs del nodo"""
-        # Combinar logs del manager con logs P2P
-        combined_logs = list(self.node_logs)
-        
+    def get_network_status(self):
+        """Obtener estado de la red con información detallada"""
         if self.p2p_node:
-            p2p_logs = self.p2p_node.get_p2p_logs()
-            for p2p_log in p2p_logs[-10:]:
-                combined_logs.append({
-                    'timestamp': p2p_log['timestamp'],
-                    'message': f"P2P: {p2p_log['message']}",
-                    'type': 'system'
-                })
+            peers = self.p2p_node.get_connected_peers()
+            return {
+                'peers_count': len(peers),
+                'peers': peers,
+                'node_id': self.p2p_node.node_id,
+                'status': 'active' if self.is_running else 'inactive',
+                'demo_nodes_count': len(self.demo_nodes),
+                'total_nodes': 1 + len(peers),
+                'demo_running': len(self.demo_nodes) > 0
+            }
+        return {'status': 'not_initialized'}
+    
+    def get_network_topology(self):
+        """Obtener topología de red REAL para visualización"""
+        if not self.p2p_node:
+            return {'nodes': [], 'connections': []}
+            
+        nodes = []
+        connections = []
         
-        # Ordenar por timestamp y devolver los últimos 50
-        combined_logs.sort(key=lambda x: x['timestamp'])
-        return combined_logs[-50:]
+        # Nodo principal
+        main_node = {
+            'id': self.p2p_node.node_id,
+            'label': f'Principal ({self.p2p_node.port})',
+            'type': 'main',
+            'active': self.is_running,
+            'port': self.p2p_node.port
+        }
+        nodes.append(main_node)
+        
+        # Peers conectados (nodos demo)
+        peers = self.p2p_node.get_connected_peers()
+        for i, peer in enumerate(peers):
+            # Extraer puerto del peer ID si es posible
+            peer_port = None
+            if 'demo_bank_' in peer:
+                try:
+                    peer_port = peer.split('_')[-1]
+                except:
+                    peer_port = 8000 + i + 1
+            
+            peer_node = {
+                'id': peer,
+                'label': f'Demo Bank {i+1}',
+                'type': 'demo',
+                'active': True,
+                'port': peer_port
+            }
+            nodes.append(peer_node)
+            
+            # Conexión bidireccional con el nodo principal
+            connections.append({
+                'from': self.p2p_node.node_id,
+                'to': peer,
+                'type': 'p2p',
+                'bidirectional': True
+            })
+        
+        return {
+            'nodes': nodes,
+            'connections': connections,
+            'timestamp': time.time()
+        }
 
 # Instancia global del manager
-chat_manager = DockerChatbotManager()
+chat_manager = WebChatbotManager()
 
 
 @app.route('/')
 def index():
-    """Página principal con interfaz del nodo actual"""
-    return render_template('node_interface.html')
+    """Página principal"""
+    return render_template('complete_demo.html')
 
-@app.route('/api/health')
-def health_check():
-    """Health check para Docker"""
-    try:
-        status = chat_manager.get_node_status()
-        return jsonify({
-            'status': 'healthy' if status['status'] == 'active' else 'unhealthy',
-            'node_id': status.get('node_id', 'unknown'),
-            'timestamp': time.time()
-        })
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-@app.route('/api/status')
-def get_status():
-    """Obtener estado del nodo"""
+# Nuevas rutas para manejo de nodos específicos
+@app.route('/api/nodes')
+def get_nodes():
+    """Obtener lista de todos los nodos"""
     try:
         return jsonify({
             'success': True,
-            'node_status': chat_manager.get_node_status(),
-            'system_running': chat_manager.is_running
+            'nodes': chat_manager.get_all_nodes()
         })
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 
-@app.route('/api/chat', methods=['POST'])
-def chat():
-    """Endpoint de chat"""
+@app.route('/api/nodes/<int:port>')
+def get_node_info(port):
+    """Obtener información de un nodo específico"""
+    try:
+        node_info = chat_manager.get_node_info(port)
+        if node_info:
+            return jsonify({
+                'success': True,
+                'node': node_info
+            })
+        else:
+            return jsonify({'success': False, 'message': 'Nodo no encontrado'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/nodes/<int:port>/chat', methods=['POST'])
+def chat_with_node(port):
+    """Chat con un nodo específico"""
     try:
         data = request.get_json()
         message = data.get('message', '')
         user_name = data.get('user_name', None)
         
-        # Procesar mensaje de forma asíncrona
+        # Ejecutar consulta asíncrona en el nodo específico
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         response = loop.run_until_complete(
-            chat_manager.process_message(message, user_name)
+            chat_manager.process_message_for_node(port, message, user_name)
         )
+        response = (response or "").replace('Â', '')
         
         return jsonify({
-            'success': True,
-            'response': response.replace('Â', '') if response else '',
-            'node_status': chat_manager.get_node_status()
+            'success': True, 
+            'response': response,
+            'node_port': port
         })
         
     except Exception as e:
@@ -388,95 +408,107 @@ def get_node_logs(port):
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 
-@app.route('/api/connect', methods=['POST'])
-def connect_to_peer():
-    """Conectar manualmente a otro nodo"""
+# Rutas anteriores mantienen compatibilidad
+@app.route('/api/init', methods=['POST'])
+def init_system():
+    """Inicializar sistema P2P"""
     try:
         data = request.get_json()
-        host = data.get('host', 'localhost')
-        port = data.get('port')
-        peer_id = data.get('peer_id', f'manual_peer_{port}')
+        port = data.get('port', 8000)
         
-        if not port:
-            return jsonify({'success': False, 'message': 'Puerto requerido'})
-        
-        if not chat_manager.p2p_node:
-            return jsonify({'success': False, 'message': 'Sistema no inicializado'})
-        
-        # Conectar de forma asíncrona
-        def connect_async():
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(
-                chat_manager.p2p_node.connect_to_peer(host, port, peer_id)
-            )
-        
-        connect_thread = threading.Thread(target=connect_async, daemon=True)
-        connect_thread.start()
-        
-        chat_manager.add_log(f"Conectando manualmente a {host}:{port}", "system")
-        
-        return jsonify({
-            'success': True,
-            'message': f'Conectando a {host}:{port}...',
-            'node_status': chat_manager.get_node_status()
-        })
-        
+        if not chat_manager.is_running:
+            chat_manager.initialize(port)
+            return jsonify({
+                'success': True, 
+                'message': f'Sistema P2P iniciado en puerto {port}',
+                'node_id': chat_manager.p2p_node.node_id if chat_manager.p2p_node else None
+            })
+        else:
+            return jsonify({
+                'success': False, 
+                'message': 'Sistema ya está activo'
+            })
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 
-@app.route('/api/broadcast', methods=['POST'])
-def broadcast_message():
-    """Enviar mensaje a todos los peers"""
+@app.route('/api/demo-network', methods=['POST'])
+def create_demo_network():
+    """Crear red de demostración REAL"""
+    try:
+        success, message = chat_manager.create_real_demo_network()
+        return jsonify({
+            'success': success,
+            'message': message
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/topology')
+def get_topology():
+    """Obtener topología de red REAL para visualización"""
+    try:
+        return jsonify({
+            'success': True,
+            'topology': chat_manager.get_network_topology()
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/test-scenarios', methods=['POST'])
+def test_scenarios():
+    """Ejecutar escenarios de prueba automáticos"""
     try:
         data = request.get_json()
-        message = data.get('message', '')
+        scenario = data.get('scenario', 'alerts')
         
-        if not chat_manager.p2p_node:
+        if not chat_manager.is_running:
             return jsonify({'success': False, 'message': 'Sistema no inicializado'})
         
-        # Broadcast de forma asíncrona
-        def broadcast_async():
+        results = []
+        
+        if scenario == 'alerts':
+            # Probar las 3 condiciones críticas
+            alerts = chat_manager.chatbot.db.detect_critical_conditions()
+            critical_types = list(set(alert['type'] for alert in alerts))
+            
+            results.append({
+                'test': 'Detección de 3 condiciones críticas',
+                'result': f'{len(critical_types)} tipos detectados: {critical_types}',
+                'success': len(critical_types) >= 3
+            })
+            
+        elif scenario == 'queries':
+            # Probar las 3 consultas requeridas
+            test_queries = [
+                "Saldo de Juan",
+                "Transacciones de María", 
+                "Alertas críticas"
+            ]
+            
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            loop.run_until_complete(
-                chat_manager.p2p_node.broadcast_message('CHAT', {'message': message})
-            )
-        
-        broadcast_thread = threading.Thread(target=broadcast_async, daemon=True)
-        broadcast_thread.start()
-        
-        chat_manager.add_log(f"Broadcast enviado: {message[:50]}...", "system")
+            
+            for query in test_queries:
+                response = loop.run_until_complete(
+                    chat_manager.process_message(query)
+                )
+                results.append({
+                    'test': f'Consulta: {query}',
+                    'result': response[:100] + '...' if len(response) > 100 else response,
+                    'success': len(response) > 0 and 'error' not in response.lower()
+                })
         
         return jsonify({
             'success': True,
-            'message': f'Mensaje enviado a {len(chat_manager.p2p_node.peers)} peers',
-            'node_status': chat_manager.get_node_status()
+            'scenario': scenario,
+            'results': results
         })
         
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 
 if __name__ == '__main__':
-    print("🐳 ChatBot P2P Financiero - Nodo Docker")
-    print("=" * 50)
-    
-    # Intentar inicializar desde configuración
-    success, message = chat_manager.initialize_from_config()
-    print(f"📡 {message}")
-    
-    if success:
-        config = chat_manager.config
-        node_name = config.get('node_id', 'Nodo_Desconocido')
-        web_port = config.get('web_port', 5000)
-        
-        print(f"🏦 Nodo: {node_name}")
-        print(f"🌐 Interfaz web: http://localhost:{web_port}")
-        print(f"🔗 Puerto P2P: {config.get('port', 'N/A')}")
-        print("=" * 50)
-        
-        # Iniciar Flask
-        app.run(debug=False, host='0.0.0.0', port=web_port)
-    else:
-        print("❌ Error inicializando nodo. Revisa la configuración.")
-        exit(1)
+    print("🚀 ChatBot P2P Financiero - Demostración Completa")
+    print("📡 Accede a: http://localhost:5000")
+    print("🔗 Red P2P con nodos reales y funcionalidad completa")
+    app.run(debug=True, host='0.0.0.0', port=5000)
